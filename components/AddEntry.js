@@ -4,7 +4,9 @@ import { getMetricMetaInfo, timeToString } from '../utils/helpers'
 import UdaciSlider from './UdaciSlider'
 import UdaciSteppers from './UdaciSteppers'
 import DateHeader from './DateHeader'
-
+import { Ionicons } from '@expo/vector-icons'
+import TextButton from './TextButton'
+import { submitEntry, removeEntry } from '../utils/api'
 
 function SubmitBtn ({ onPress }) {
   return (
@@ -15,17 +17,14 @@ function SubmitBtn ({ onPress }) {
   )
 }
 
-
 export default class AddEntry extends Component {
-
   state = {
-    run : 0,
-    bike : 0,
-    swin : 0,
-    sleep : 0,
-    eat : 0
+    run: 0,
+    bike: 0,
+    swim: 0,
+    sleep: 0,
+    eat: 0,
   }
-
   increment = (metric) => {
     const { max, step } = getMetricMetaInfo(metric)
 
@@ -34,13 +33,12 @@ export default class AddEntry extends Component {
 
       return {
         ...state,
-        [metric]: count > max ? max : count 
+        [metric]: count > max ? max : count,
       }
     })
   }
-
   decrement = (metric) => {
-      this.setState((state) => {
+    this.setState((state) => {
       const count = state[metric] - getMetricMetaInfo(metric).step
 
       return {
@@ -49,13 +47,11 @@ export default class AddEntry extends Component {
       }
     })
   }
-
   slide = (metric, value) => {
     this.setState(() => ({
-      [metric] : value,
+      [metric]: value
     }))
   }
-
   submit = () => {
     const key = timeToString()
     const entry = this.state
@@ -66,13 +62,36 @@ export default class AddEntry extends Component {
 
     // Navigate to home
 
-    // Save to "DB"
+    submitEntry({ key, entry })
 
     // Clear local notification
   }
+  reset = () => {
+    const key = timeToString()
 
+    // Update Redux
+
+    // Route to Home
+
+    removeEntry(key)
+  }
   render() {
     const metaInfo = getMetricMetaInfo()
+
+    if (this.props.alreadyLogged) {
+      return (
+        <View>
+          <Ionicons
+            name={'ios-happy-outline'}
+            size={100}
+          />
+          <Text>You already logged your information for today.</Text>
+          <TextButton onPress={this.reset}>
+            Reset
+          </TextButton>
+        </View>
+      )
+    }
 
     return (
       <View>
@@ -96,11 +115,11 @@ export default class AddEntry extends Component {
                     onDecrement={() => this.decrement(key)}
                     {...rest}
                   />}
-                <SubmitBtn onPress={this.submit} />
             </View>
           )
         })}
-    </View>
+        <SubmitBtn onPress={this.submit} />
+      </View>
     )
   }
-} 
+}
