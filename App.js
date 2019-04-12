@@ -16,6 +16,7 @@ import { purple, white } from './utils/colors'
 import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import EntryDetail from './components/EntryDetail'
 import Live from './components/Live'
+import { setLocalNotification } from './utils/helpers'
 
 function UdaciStatusBar ({backgroundColor, ...props}) {
   return (
@@ -95,6 +96,10 @@ const MainNavigator = createStackNavigator({
 const TabsContainer = createAppContainer(MainNavigator)
 
 export default class App extends React.Component {
+  componentDidMount() {
+    setLocalNotification()
+  }
+  
   render() {
     return (
       <Provider store={createStore(reducer)}>
